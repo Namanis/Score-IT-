@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -69,5 +70,11 @@ public class BetService {
         return betRepository.findByMatch_Id(matchId).stream()
                 .map(BetResponse::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<BetResponse> findUserBet(Long matchId, Long userId) {
+        return betRepository.findByMatch_IdAndParticipant_User_Id(matchId, userId)
+                .map(BetResponse::from);
     }
 }
