@@ -42,7 +42,6 @@ public class GameController {
     }
 
     @GetMapping("/{id}/leaderboard")
-    @ResponseStatus(HttpStatus.FOUND)
     public List<LeaderboardEntryResponse> getLeaderboard(@PathVariable Long id){
         return gameService.getLeaderboard(id);
     }

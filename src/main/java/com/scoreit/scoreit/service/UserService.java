@@ -20,7 +20,7 @@ public class UserService {
 
     @Transactional
     public UserResponse createUser(CreateUserRequest request){
-        String username = request.username().trim();
+        String username = request.username().trim().toLowerCase();
         String email = request.email().trim().toLowerCase();
 
         if (userRepository.existsByUsername(username)) {
