@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<aside class="standings" th:fragment="standings" aria-label="Standings">
+    <h2>Standings</h2>
+
+    <p class="note" th:if="${game == null}">Pick a game to see who’s leading.</p>
+
+    <th:block th:if="${game != null}">
+        <p class="note" th:if="${#lists.isEmpty(standings)}">Nobody has joined yet.</p>
+
+        <ol class="table" th:unless="${#lists.isEmpty(standings)}">
+            <li th:each="entry, row : ${standings}"
+                th:classappend="${me != null and entry.username() == me.username()} ? 'me'">
+                <span class="rank" th:text="${row.count}">1</span>
+                <span class="who" th:text="${entry.username()}">ana</span>
+                <span class="total" th:text="${entry.score()}">46</span>
+            </li>
+        </ol>
+    </th:block>
+</aside>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-package com.scoreit.scoreit.controller.web.view;
+package com.scoreit.scoreit.controller.web;
 
 import lombok.Getter;
 import lombok.Setter;

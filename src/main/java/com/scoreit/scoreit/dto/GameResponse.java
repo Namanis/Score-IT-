@@ -6,7 +6,7 @@ import com.scoreit.scoreit.model.enums.GameStatus;
 import java.time.Instant;
 
 public record GameResponse(
-        Long Id,
+        Long id,
         String name,
         GameStatus status,
         String createdBy,

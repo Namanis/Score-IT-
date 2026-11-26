@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${game != null ? game.name() + ' – ScoreIt' : 'ScoreIt'})}"></head>
+<body>
+
+<header th:replace="~{fragments/layout :: topbar}"></header>
+
+<main class="layout">
+
+    <nav class="side" aria-label="Games">
+        <h2>Games</h2>
+        <ul class="game-list">
+            <li class="note" th:if="${#lists.isEmpty(games)}">No open games.</li>
+            <li th:each="g : ${games}">
+                <a th:href="@{/games/{id}(id=${g.id()})}"
+                   th:text="${g.name()}"
+                   th:aria-current="${game != null and g.id() == game.id()} ? 'page'">NBA Week 12</a>
+            </li>
+        </ul>
+        <button class="btn quiet small" type="button" data-open="game-dialog" th:disabled="${me == null}">Start a game</button>
+    </nav>
+
+    <section>
+        <!-- No players yet -->
+        <div class="empty" th:if="${#lists.isEmpty(players)}">
+            <strong>Create the first player to start</strong>
+            Players join games and guess the final score of each match.
+            <div><button class="btn" type="button" data-open="player-dialog">Create a player</button></div>
+        </div>
+
+        <!-- Players, but no game selected -->
+        <div class="empty" th:if="${!#lists.isEmpty(players) and game == null}">
+            <strong>No open games yet</strong>
+            Start a game, add some matches, and invite your friends to guess.
+            <div><button class="btn" type="button" data-open="game-dialog">Start a game</button></div>
+        </div>
+
+        <!-- The game -->
+        <th:block th:if="${game != null}">
+            <div class="game-head">
+                <div>
+                    <h1 th:text="${game.name()}">NBA Week 12</h1>
+                    <div class="game-sub">
+                        <span th:text="|Started by ${game.createdBy()}|">Started by ana</span>
+                        <span th:text="${#lists.size(standings)} + ' ' + (${#lists.size(standings) == 1} ? 'player' : 'players')">3 players</span>
+                        <span class="joined-tag" th:if="${joined}">You’re in</span>
+                    </div>
+                </div>
+                <form method="post" th:if="${me != null and !joined}" th:action="@{/games/{id}/join(id=${game.id()})}">
+                    <button class="btn" type="submit">Join game</button>
+                </form>
+            </div>
+
+            <div class="matches-head">
+                <h2>Matches</h2>
+                <button class="btn quiet small" type="button" data-open="match-dialog">Add match</button>
+            </div>
+
+            <div class="empty" th:if="${#lists.isEmpty(matches)}">
+                <strong>No matches in this game yet</strong>
+                Add a match so players can start guessing.
+            </div>
+
+            <div class="match-list" th:unless="${#lists.isEmpty(matches)}">
+                <th:block th:each="view : ${matches}">
+                    <article th:replace="~{fragments/match-card :: card(${view})}"></article>
+                </th:block>
+            </div>
+        </th:block>
+    </section>
+
+    <aside th:replace="~{fragments/standings :: standings}"></aside>
+</main>
+
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<dialog th:replace="~{fragments/dialogs :: player}"></dialog>
+<dialog th:replace="~{fragments/dialogs :: game}"></dialog>
+<th:block th:if="${game != null}">
+    <dialog th:replace="~{fragments/dialogs :: match(${game.id()})}"></dialog>
+</th:block>
+
+</body>
+</html>

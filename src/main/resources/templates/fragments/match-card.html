@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- One match, drawn as a scoreboard. "view" is a MatchView. -->
+<article class="match" th:fragment="card(view)" th:id="|match-${view.match().id()}|">
+
+    <div class="board">
+        <div class="team home">
+            <span class="team-name" th:text="${view.match().homeTeam()}">Lakers</span>
+            <span class="team-side">Home</span>
+        </div>
+
+        <div class="digits" th:if="${view.finished()}"
+             th:aria-label="|Final score ${view.match().homeScore()} to ${view.match().awayScore()}|">
+            <span class="digit" th:classappend="${view.awayWon()} ? 'lost'" th:text="${view.match().homeScore()}">100</span>
+            <span class="dash"></span>
+            <span class="digit" th:classappend="${view.homeWon()} ? 'lost'" th:text="${view.match().awayScore()}">86</span>
+        </div>
+        <div class="digits" th:unless="${view.finished()}" aria-label="No score yet">
+            <span class="digit off">00</span>
+            <span class="dash"></span>
+            <span class="digit off">00</span>
+        </div>
+
+        <div class="team away">
+            <span class="team-name" th:text="${view.match().awayTeam()}">Celtics</span>
+            <span class="team-side">Away</span>
+        </div>
+    </div>
+
+    <div class="match-body">
+        <div class="match-meta">
+            <time th:datetime="${view.match().startTime()}" th:text="${view.startLabel()}">Sat 30 Nov, 19:30</time>
+            <span class="state" th:if="${view.upcoming()}">Upcoming</span>
+            <span class="state live" th:if="${view.live()}">In progress</span>
+            <span class="state final" th:if="${view.finished()}">Final</span>
+        </div>
+
+        <p class="your-guess" th:if="${view.myGuess() != null}">
+            Your guess:
+            <b th:text="|${view.myGuess().predictedHomeScore()}–${view.myGuess().predictedAwayScore()}|">100–86</b>
+            <span class="earned" th:if="${view.myGuess().pointsEarned() != null}"
+                  th:text="|+${view.myGuess().pointsEarned()} points|">+46 points</span>
+        </p>
+
+        <!-- Before tip-off: guess once -->
+        <th:block th:if="${view.upcoming()}">
+            <p class="note" th:if="${me != null and !joined}">Join the game to guess this match.</p>
+
+            <th:block th:if="${joined and view.myGuess() == null}">
+                <form class="inline-form" method="post" th:action="@{/matches/{id}/bets(id=${view.match().id()})}">
+                    <input type="number" name="home" min="0" max="250" required placeholder="Home"
+                           th:aria-label="|${view.match().homeTeam()} points|">
+                    <span class="vs">to</span>
+                    <input type="number" name="away" min="0" max="250" required placeholder="Away"
+                           th:aria-label="|${view.match().awayTeam()} points|">
+                    <button class="btn small" type="submit">Save guess</button>
+                </form>
+                <p class="note">You can guess once, before tip-off.</p>
+            </th:block>
+
+            <p class="note" th:if="${view.myGuess() != null}">Other guesses stay hidden until tip-off.</p>
+        </th:block>
+
+        <!-- After tip-off: enter the final score -->
+        <form class="inline-form" method="post" th:if="${view.live()}"
+              th:action="@{/matches/{id}/result(id=${view.match().id()})}">
+            <input type="number" name="home" min="0" max="250" required placeholder="Home"
+                   th:aria-label="|${view.match().homeTeam()} final score|">
+            <span class="vs">to</span>
+            <input type="number" name="away" min="0" max="250" required placeholder="Away"
+                   th:aria-label="|${view.match().awayTeam()} final score|">
+            <button class="btn small" type="submit">Save final score</button>
+        </form>
+
+        <!-- After tip-off: everyone's guesses -->
+        <details class="guesses-box" th:unless="${view.upcoming()}" th:open="${view.finished()}">
+            <summary th:text="|Guesses (${#lists.size(view.bets())})|">Guesses (3)</summary>
+            <p class="note" th:if="${#lists.isEmpty(view.bets())}">Nobody guessed this match.</p>
+            <ul class="guesses" th:unless="${#lists.isEmpty(view.bets())}">
+                <li th:each="bet : ${view.bets()}">
+                    <span th:text="${bet.username()}">ana</span>
+                    <span class="score" th:text="|${bet.predictedHomeScore()}–${bet.predictedAwayScore()}|">110–102</span>
+                    <span class="pts pending" th:if="${bet.pointsEarned() == null}">Pending</span>
+                    <span class="pts" th:unless="${bet.pointsEarned() == null}"
+                          th:classappend="${bet.pointsEarned() == 0} ? 'zero'"
+                          th:text="|+${bet.pointsEarned()}|">+46</span>
+                </li>
+            </ul>
+        </details>
+    </div>
+</article>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<dialog id="player-dialog" th:fragment="player">
+    <form method="post" th:action="@{/players}">
+        <h3>New player</h3>
+        <div class="field">
+            <label for="p-username">Username</label>
+            <input id="p-username" name="username" type="text" required autocomplete="off">
+        </div>
+        <div class="field">
+            <label for="p-email">Email</label>
+            <input id="p-email" name="email" type="email" required autocomplete="off">
+        </div>
+        <div class="dialog-actions">
+            <button class="btn quiet" type="button" data-close>Cancel</button>
+            <button class="btn" type="submit">Create player</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="game-dialog" th:fragment="game">
+    <form method="post" th:action="@{/games}">
+        <h3>Start a game</h3>
+        <div class="field">
+            <label for="g-name">Game name</label>
+            <input id="g-name" name="name" type="text" required placeholder="NBA Week 13" autocomplete="off">
+        </div>
+        <p class="note" th:if="${me != null}" th:text="|You’ll start it as ${me.username()}.|">You’ll start it as ana.</p>
+        <div class="dialog-actions">
+            <button class="btn quiet" type="button" data-close>Cancel</button>
+            <button class="btn" type="submit">Start game</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="match-dialog" th:fragment="match(gameId)">
+    <form method="post" th:action="@{/games/{id}/matches(id=${gameId})}">
+        <h3>Add a match</h3>
+        <div class="field-row">
+            <div class="field">
+                <label for="m-home">Home team</label>
+                <input id="m-home" name="homeTeam" type="text" required placeholder="Lakers" autocomplete="off">
+            </div>
+            <div class="field">
+                <label for="m-away">Away team</label>
+                <input id="m-away" name="awayTeam" type="text" required placeholder="Celtics" autocomplete="off">
+            </div>
+        </div>
+        <div class="field">
+            <label for="m-start">Tip-off</label>
+            <input id="m-start" name="startTime" type="datetime-local" required data-default-tomorrow>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn quiet" type="button" data-close>Cancel</button>
+            <button class="btn" type="submit">Add match</button>
+        </div>
+    </form>
+</dialog>
+
+</body>
+</html>

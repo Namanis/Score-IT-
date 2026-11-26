@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Shared <head>: page title, fonts, stylesheet and script -->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title}">ScoreIt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/scoreit.css}">
+    <script th:src="@{/js/scoreit.js}" defer></script>
+</head>
+
+<body>
+
+<!-- Top bar: logo and the player switcher -->
+<header class="topbar" th:fragment="topbar">
+    <a class="wordmark" th:href="@{/}">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+            <circle cx="16" cy="16" r="14" fill="#E8862A"/>
+            <path d="M2 16h28M16 2v28M6 6c5 4 5 16 0 20M26 6c-5 4-5 16 0 20" stroke="#1A1208" stroke-width="1.6" fill="none"/>
+        </svg>
+        ScoreIt
+    </a>
+    <div class="player">
+        <form method="post" th:action="@{/players/select}" th:unless="${#lists.isEmpty(players)}">
+            <label for="player-select">Playing as</label>
+            <select id="player-select" name="userId" data-autosubmit>
+                <option th:each="p : ${players}"
+                        th:value="${p.id()}"
+                        th:text="${p.username()}"
+                        th:selected="${me != null and p.id() == me.id()}">ana</option>
+            </select>
+            <noscript><button class="btn quiet small" type="submit">Switch</button></noscript>
+        </form>
+        <button class="btn quiet small" type="button" data-open="player-dialog">New player</button>
+    </div>
+</header>
+
+<!-- Success and error messages after a form is sent -->
+<div class="toast-stack" th:fragment="flash">
+    <div class="toast" role="status" th:if="${message}" th:text="${message}">Saved</div>
+    <div class="toast error" role="alert" th:if="${error}" th:text="${error}">Something went wrong</div>
+</div>
+
+</body>
+</html>
